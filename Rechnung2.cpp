@@ -25,7 +25,7 @@ Produkt::Produkt(){
 
 void Produkt::writeProduktInfo(int counter){
 	std::ofstream produktinfo;
-	produktinfo.open("Produkte.csv");
+	produktinfo.open("Produkte.csv", std::ios::app);
 	produktinfo << counter <<" " <<this->produktname<< " "<< this->anzahl<< " " << this->preis << " " << this->gesamtPreis << std::endl;
 	produktinfo.close();
 }
