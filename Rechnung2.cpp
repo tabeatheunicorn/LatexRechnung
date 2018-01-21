@@ -1,6 +1,11 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <limits>
+#include <string_view>
+#include <iomanip>
+#include <stdio.h>
+
 
 //Ein Produkt muss einen Namen und einen Preis haben, die Anzahl ist defaultmäßig bei 1 und kann bei Bedarf geändert werden.
 struct Produkt{
@@ -16,10 +21,15 @@ struct Produkt{
 Produkt::Produkt(){
 	std::cout << "Gib den Namen des Produktes ein" << std::endl;
 	std::getline(std::cin, produktname);
+	std::cin.clear();
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	std::cout << "Gib den Preis des Produktes ein in der Form xxxx.yy EUR" << std::endl;
 	std::cin >> preis;
-	std::cout << "Gib die Anzahl der verkauften Produkte ein" << std::endl;
+	std::cin.clear();
+	std::cout << "Gib die Anzahl der verkaufte Produkte ein" << std::endl;
 	std::cin >> anzahl;
+	std::cin.clear();
 	gesamtPreis = preis * (double) anzahl;
 }
 
@@ -78,21 +88,31 @@ void erstellePDF(Kundendaten *kunde){
 	}
 }
 
+template <typename T> T getInput(const std::string_view output){
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max());
+	std::cout <<output << std::endl;
+	T eingabe;
+	std::cin >> eingabe;
+	return eingabe;
+}
+
 int main(){
 	// In den richtigen Ordner wechseln.
-	system("cd \\mnt\\C:\\Users\\tabea\\Desktop\\Rechnung_Excel_Latex");
+	system("cd /mnt/c/Users/tabea/Desktop/Rechnung_Excel_Latex");
 	int produktCounter = 0;
 	double gesamtPreis = 0.0;
 	int weiter{};
 	//Alle Produkte für die Rechnung eingeben.
 	do{
-		++produktCounter;
+		produktCounter += 1;
 		Produkt * p = new Produkt();
 		p->writeProduktInfo(produktCounter);
 		gesamtPreis += p->preis;
 		std::cout << "möchtest du weitermachen? dann gib eine zahl ungleich 0 ein" << std::endl;
 		std::cin >> weiter;
-
+		std::cout << weiter << std::endl;
+		//std::cin.ignore(std::numeric_limits<std::streamsize>::max());
+		std::fflush(stdin);
 	} while ( 0 != weiter );
    
 	//Endwerte der Rechnung in Datei schreiben
