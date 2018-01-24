@@ -20,16 +20,13 @@ struct Produkt{
 };
 Produkt::Produkt(){
 	std::cout << "Gib den Namen des Produktes ein" << std::endl;
+	std::cin.sync();
 	std::getline(std::cin, produktname);
-	std::cin.clear();
-	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	std::cout << "Gib den Preis des Produktes ein in der Form xxxx.yy EUR" << std::endl;
 	std::cin >> preis;
-	std::cin.clear();
 	std::cout << "Gib die Anzahl der verkaufte Produkte ein" << std::endl;
 	std::cin >> anzahl;
-	std::cin.clear();
 	gesamtPreis = preis * (double) anzahl;
 }
 
@@ -55,7 +52,18 @@ struct Kundendaten{
 	void setFirmendaten(std::string firma, std::string firmastrasse, std::string firmaort);
 };
 Kundendaten::Kundendaten(){
-	std::cerr << "Ein Kunde braucht Namen, Straße und Ort." <<std::endl;
+	std::cout << "Gib den Namen des Kunden ein" << std::endl;
+	std::cin.sync();
+	std::getline(std::cin, name);
+	std::cin.clear();
+	std::cout << "Gib Straße und Hausnummer des Kunden ein" << std::endl;
+	std::cin.sync();
+	std::getline(std::cin, strasse);
+	std::cin.clear();
+	std::cout << "Gib PLZ und Ort des Kunden ein" << std::endl;
+	std::cin.sync();
+	std::getline(std::cin, ort);
+	std::cin.clear();
 }
 Kundendaten::Kundendaten(std::string name, std::string strasse, std::string ort){
 	name = name;
@@ -96,9 +104,17 @@ template <typename T> T getInput(const std::string_view output){
 	return eingabe;
 }
 
+void produktDateivorbereiten(){
+	std::ofstream produktinfo;
+	produktinfo.open("Produkte.csv"); //überschreibt datei
+	produktinfo << "Position" <<" " <<"Posten"<< " "<< "Anzahl"<< " " << "Einzelpreis" << " " << "Gesamtpreis" << std::endl;
+	produktinfo.close();
+}
+
 int main(){
 	// In den richtigen Ordner wechseln.
 	system("cd /mnt/c/Users/tabea/Desktop/Rechnung_Excel_Latex");
+	void produktDateivorbereiten();
 	int produktCounter = 0;
 	double gesamtPreis = 0.0;
 	int weiter{};
@@ -109,10 +125,8 @@ int main(){
 		p->writeProduktInfo(produktCounter);
 		gesamtPreis += p->preis;
 		std::cout << "möchtest du weitermachen? dann gib eine zahl ungleich 0 ein" << std::endl;
+		std::cin.sync();
 		std::cin >> weiter;
-		std::cout << weiter << std::endl;
-		//std::cin.ignore(std::numeric_limits<std::streamsize>::max());
-		std::fflush(stdin);
 	} while ( 0 != weiter );
    
 	//Endwerte der Rechnung in Datei schreiben
@@ -120,5 +134,33 @@ int main(){
 	gesamt.open("Rechnung.csv");
 	gesamt << gesamtPreis << std::endl << gesamtPreis*0.19 << std::endl << gesamtPreis*1.19;
 	gesamt.close();
+
+	//Kunden anlegen
+	Kundendaten *k = new Kundendaten();
+	int liefer{0};
+	std::cout <<" Hat der Kunde eine Lieferadresse? Gib 1 ein wenn ja" << std::endl;
+	std::cin.sync();
+	std::cin >> liefer;
+	if (1 == liefer){
+		std::string firma_name{};
+		std::string firma_strasse{};
+		std::string firma_ort{};
+		std::cout << "Gib den Namen der Firma ein" << std::endl;
+		std::cin.sync();
+		std::getline(std::cin, firma_name);
+		std::cin.clear();
+		std::cout << "Gib Straße und Hausnummer der Firma ein" << std::endl;
+		std::cin.sync();
+		std::getline(std::cin, firma_strasse);
+		std::cin.clear();
+		std::cout << "Gib PLZ und Ort der Firma ein" << std::endl;
+		std::cin.sync();
+		std::getline(std::cin, firma_ort);
+		std::cin.clear();
+		k->setFirmendaten(firma_name, firma_strasse, firma_ort);
+	}
+		erstellePDF(k);
+
+
     	return 0;
 }
